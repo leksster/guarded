@@ -36,6 +36,8 @@ defmodule GuardedWeb.Endpoint do
     key: "_guarded_key",
     signing_salt: "PGOC7ZEy"
 
+  plug CORSPlug
+
   plug GuardedWeb.Router
 
   @doc """

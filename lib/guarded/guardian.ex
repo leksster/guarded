@@ -1,6 +1,5 @@
 defmodule Guarded.Guardian do
-  use Guardian, otp_app: :sample_guardian,
-                secret_key: "IpY+SiSzhrgyoNci8ZZ2iZeeDDxvpUiuMs02AO+PmzoF/Ck+ezhUM5yHlWKiK1mO"
+  use Guardian, otp_app: :guarded
 
   alias Guarded.Accounts
   alias Guarded.Accounts.User
