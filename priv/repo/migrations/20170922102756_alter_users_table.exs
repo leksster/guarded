@@ -11,7 +11,7 @@ defmodule Guarded.Repo.Migrations.AlterUsersTable do
       add :last_name, :string, null: false
     end
 
-    create index(:users, [:email])
+    create unique_index(:users, [:email])
   end
 
   def down do

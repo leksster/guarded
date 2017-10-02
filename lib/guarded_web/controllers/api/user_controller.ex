@@ -1,8 +1,12 @@
 defmodule GuardedWeb.UserController do
+  require IEx
+
   use GuardedWeb, :controller
 
+  alias Guarded.Repo
   alias Guarded.Accounts
   alias Guarded.Accounts.User
+  alias Guarded.Guardian
 
   action_fallback GuardedWeb.FallbackController
 
@@ -12,12 +16,30 @@ defmodule GuardedWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", user_path(conn, :show, user))
-      |> render("show.json", user: user)
+    changeset = User.registration_changeset(%User{}, user_params)
+
+    case Repo.insert(changeset) do
+      {:ok, user} ->
+        # IEx.pry
+        new_conn = Guardian.Plug.sign_in(conn, user)
+        jwt = Guardian.Plug.current_token(new_conn)
+
+        new_conn
+        |> send_resp(201, "alalal #{jwt}")
+        # |> put_status(:created)
+        # |> render(Guarded.SessionView, "show.json", user: user, jwt: jwt)
+      {:error, changeset} ->
+        conn
+        |> send_resp(404, "alalal")
+        # |> render(Guarded.ChangesetView, "error.json", changeset: changeset)
     end
+
+    # with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
+    #   conn
+    #   |> put_status(:created)
+    #   |> put_resp_header("location", user_path(conn, :show, user))
+    #   |> render("show.json", user: user)
+    # end
   end
 
   def show(conn, %{"id" => id}) do
